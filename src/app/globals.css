@@ -1,26 +1,116 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+@layer base {
+  :root {
+    --background: #ffffff;
+    --foreground: #0f172a;
+    --primary: #10b981;
+    --primary-foreground: #ffffff;
+    --card: #ffffff;
+    --card-foreground: #0f172a;
+    --muted: #f8fafc;
+    --muted-foreground: #64748b;
+    --border: #e2e8f0;
+    --ring: rgba(16, 185, 129, 0.4);
+  }
+
+  .dark {
+    --background: #020617;
+    --foreground: #f8fafc;
+    --primary: #10b981;
+    --primary-foreground: #000000;
+    --card: #0b1120;
+    --card-foreground: #f8fafc;
+    --muted: #1e293b;
+    --muted-foreground: #94a3b8;
+    --border: #1e293b;
+    --ring: rgba(16, 185, 129, 0.6);
+  }
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-border: var(--border);
+  /* নিচের লাইনটি এরর ফিক্স করবে */
+  --color-ring: var(--ring); 
+  
+  --radius-dashboard: 2rem;
+  --radius-card: 1.25rem;
+  --shadow-neon: 0 0 15px var(--ring);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+@layer base {
+  * {
+    /* outline-ring এর বদলে সরাসরি ভেরিয়েবল বা color-ring ব্যবহার করুন */
+    border-color: var(--border);
+  }
+
+  body {
+    background-color: var(--background);
+    color: var(--foreground);
+    font-feature-settings: "rlig" 1, "calt" 1;
+    @apply transition-colors duration-500 antialiased selection:bg-primary/20;
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+/* --- Premium Components --- */
+@layer components {
+  .glass-card {
+    background-color: var(--card);
+    border: 1px solid var(--border);
+    backdrop-filter: blur(8px);
+    border-radius: var(--radius-card);
+    @apply transition-all duration-300 ease-in-out relative overflow-hidden;
+  }
+
+  .glass-card::before {
+    content: "";
+    @apply absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent opacity-0 transition-opacity duration-500;
+  }
+
+  .glass-card:hover {
+    @apply -translate-y-1 shadow-xl;
+    border-color: color-mix(in srgb, var(--primary), transparent 70%);
+  }
+
+  .glass-card:hover::before {
+    @apply opacity-100;
+  }
+
+  .hero-gradient {
+    background: radial-gradient(circle at 50% 50%, color-mix(in srgb, var(--primary), transparent 92%) 0%, transparent 50%);
+  }
+
+  .btn-glow:hover {
+    box-shadow: var(--shadow-neon);
+  }
+}
+
+/* --- Animations --- */
+@keyframes slide-up {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-slide-up {
+  animation: slide-up 0.6s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+/* Custom Scrollbar */
+@layer utilities {
+  .custom-scrollbar::-webkit-scrollbar {
+    width: 6px;
+  }
+  .custom-scrollbar::-webkit-scrollbar-thumb {
+    background-color: var(--border);
+    border-radius: 10px;
+    @apply hover:bg-primary/50 transition-colors;
+  }
 }
