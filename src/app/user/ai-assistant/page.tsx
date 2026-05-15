@@ -15,7 +15,7 @@ import {
 import { Button } from "@/components/ui/button";
 
 import { formatCurrency } from "@/lib/utils";
-import AIService from "../services/ai.service";
+import AIService from "@/app/services/ai.service";
 
 interface Message {
   id: string;

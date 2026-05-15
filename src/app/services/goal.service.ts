@@ -1,64 +1,83 @@
 
 import { api } from '@/lib/api';
-import { 
-  Goal, 
-  CreateGoalDto, 
-  UpdateGoalDto, 
-  AddAmountDto,
-  GoalDashboard,
-  ApiResponse 
-} from '@/types/goal.types';
+
+export interface Goal {
+  id: string;
+  name: string;
+  targetAmount: number;
+  currentAmount: number;
+  deadline: string;
+  note?: string;
+  isCompleted: boolean;
+  progress: number;
+  remaining: number;
+  daysRemaining: number;
+  createdAt: string;
+}
+
+export interface CreateGoalDto {
+  name: string;
+  targetAmount: number;
+  deadline: string;
+  note?: string;
+}
+
+export interface ApiResponse<T = any> {
+  success: boolean;
+  data: T;
+  message?: string;
+  pagination?: {
+    page: number;
+    limit: number;
+    total: number;
+    totalPages: number;
+  };
+}
 
 export const goalService = {
-  // POST /api/v1/goals - নতুন গোল তৈরি
-  create: async (data: CreateGoalDto): Promise<ApiResponse<Goal>> => {
-    const response = await api.post('/goals', data);
-    return response.data;
-  },
-
-  // GET /api/v1/goals - সব গোল পাওয়া
+  // সব গোল পাওয়া
   getAll: async (params?: { page?: number; limit?: number; status?: string }): Promise<ApiResponse<Goal[]>> => {
     const response = await api.get('/goals', { params });
     return response.data;
   },
 
-  // GET /api/v1/goals/dashboard - গোল ড্যাশবোর্ড
-  getDashboard: async (): Promise<ApiResponse<GoalDashboard>> => {
+  // গোল ড্যাশবোর্ড
+  getDashboard: async (): Promise<ApiResponse<any>> => {
     const response = await api.get('/goals/dashboard');
     return response.data;
   },
 
-  // GET /api/v1/goals/:id - নির্দিষ্ট গোল পাওয়া
-  getById: async (id: string): Promise<ApiResponse<Goal>> => {
-    const response = await api.get(`/goals/${id}`);
+  // নতুন গোল তৈরি
+  create: async (data: CreateGoalDto): Promise<ApiResponse<Goal>> => {
+    const response = await api.post('/goals', data);
     return response.data;
   },
 
-  // PATCH /api/v1/goals/:id/add - গোলে টাকা যোগ
+  // গোলে টাকা যোগ
   addAmount: async (id: string, amount: number): Promise<ApiResponse<Goal>> => {
-    const response = await api.patch(`/goals/${id}/add`, { amount });
+    const response = await api.patch(`/goals/add-amount/${id}`, { amount });
     return response.data;
   },
 
-  // PATCH /api/v1/goals/:id/remove - গোল থেকে টাকা কমানো
+  // গোল থেকে টাকা কমানো
   removeAmount: async (id: string, amount: number): Promise<ApiResponse<Goal>> => {
-    const response = await api.patch(`/goals/${id}/remove`, { amount });
+    const response = await api.patch(`/goals/remove-amount/${id}`, { amount });
     return response.data;
   },
 
-  // PATCH /api/v1/goals/:id/complete - গোল সম্পন্ন করা
+  // গোল সম্পন্ন
   complete: async (id: string): Promise<ApiResponse<Goal>> => {
-    const response = await api.patch(`/goals/${id}/complete`);
+    const response = await api.patch(`/goals/complete/${id}`);
     return response.data;
   },
 
-  // PATCH /api/v1/goals/:id - গোল আপডেট
-  update: async (id: string, data: UpdateGoalDto): Promise<ApiResponse<Goal>> => {
+  // গোল আপডেট
+  update: async (id: string, data: Partial<CreateGoalDto>): Promise<ApiResponse<Goal>> => {
     const response = await api.patch(`/goals/${id}`, data);
     return response.data;
   },
 
-  // DELETE /api/v1/goals/:id - গোল ডিলিট
+  // গোল ডিলিট
   delete: async (id: string): Promise<ApiResponse<null>> => {
     const response = await api.delete(`/goals/${id}`);
     return response.data;

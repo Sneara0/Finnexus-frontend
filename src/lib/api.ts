@@ -1,6 +1,6 @@
-
 import axios from 'axios';
 
+// আপনার লাইভ ব্যাকএন্ড ইউআরএল অথবা লোকাল হোস্ট
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api/v1';
 
 export const api = axios.create({
@@ -11,10 +11,10 @@ export const api = axios.create({
   timeout: 30000,
 });
 
-// Request interceptor - টোকেন যোগ করে
+// ✅ Request interceptor: প্রতিটি রিকোয়েস্টের সাথে অটোমেটিক টোকেন পাঠাবে
 api.interceptors.request.use(
   (config) => {
-    const token = localStorage.getItem('token');
+    const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
@@ -23,14 +23,16 @@ api.interceptors.request.use(
   (error) => Promise.reject(error)
 );
 
-// Response interceptor - এরর হ্যান্ডলিং
+// ✅ Response interceptor: টোকেন এক্সপায়ার হলে অটোমেটিক লগআউট করাবে
 api.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response?.status === 401) {
-      localStorage.removeItem('token');
-      localStorage.removeItem('user');
-      window.location.href = '/login';
+      if (typeof window !== 'undefined') {
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
+        window.location.href = '/login';
+      }
     }
     return Promise.reject(error);
   }
