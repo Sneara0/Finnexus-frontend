@@ -13,8 +13,6 @@ import {
   Menu, LayoutGrid, List, Maximize2, Minimize2
 } from "lucide-react";
 import Link from "next/link";
-
-import { Goal, GoalDashboard } from "@/types/goal.types";
 import { formatCurrency, formatDate } from "@/lib/utils";
 import goalService from "../services/goal.service";
 

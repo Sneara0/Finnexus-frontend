@@ -1,9 +1,9 @@
 import axios from "axios";
 
-// ✅ লোকাল এবং ডেপ্লয়মেন্ট উভয় জায়গার জন্য ডাইনামিক ইউআরএল
+// ১. API_URL একবারই ডিক্লেয়ার করুন
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api/v1";
 
-// Axios Instance তৈরি (এটি করলে কোড আরও ক্লিন হয়)
+// ২. Axios instance তৈরি করুন (এটি প্রফেশনাল পদ্ধতি)
 const api = axios.create({
   baseURL: API_URL,
   headers: {
@@ -24,18 +24,17 @@ export const registerUser = async (userData: any) => {
 // Login API
 export const loginUser = async (credentials: any) => {
   try {
+    // এখানে আপনার স্ক্রিনশটে দুইবার response ছিল, আমি একটি করে দিয়েছি
     const response = await api.post("/auth/login", credentials);
     
-    // টোকেন এবং ইউজার ডেটা সেভ করা
+    // যদি লগইন সফল হয় এবং টোকেন আসে
     if (response.data.success && response.data.data?.token) {
       localStorage.setItem("token", response.data.data.token);
-      // প্রয়োজন হলে ইউজার ইনফোও সেভ করতে পারেন
       localStorage.setItem("user", JSON.stringify(response.data.data.user));
     }
     
     return response.data;
   } catch (error: any) {
-    // ব্যাকেন্ড থেকে আসা নির্দিষ্ট এরর মেসেজটি থ্রো করা
     throw error.response?.data || new Error("Login failed");
   }
 };
