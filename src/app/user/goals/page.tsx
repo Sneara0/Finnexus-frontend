@@ -9,21 +9,21 @@ import {
   Calendar, Clock, Award, Crown, Trophy, Sparkles,
   Wallet, ArrowUp, ArrowDown, CheckCircle, Loader2,
   X, Rocket, Gift, Heart, Car, Home, Plane,
-  GraduationCap, Briefcase, ShoppingBag
+  GraduationCap, Briefcase, ShoppingBag, AlertCircle
 } from 'lucide-react';
 
 import { formatCurrency, formatDate } from '@/lib/utils';
 import goalService, { Goal } from '@/app/services/goal.service';
-
 
 const getRandomIcon = () => {
   const icons = [Car, Home, Plane, GraduationCap, Briefcase, Gift, Heart, ShoppingBag, Rocket, Award];
   return icons[Math.floor(Math.random() * icons.length)];
 };
 
-const GoalsPage = () => {
+export default function GoalsPage() {
   const [goals, setGoals] = useState<Goal[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [stats, setStats] = useState({
     totalGoals: 0,
     completedGoals: 0,
@@ -48,6 +48,7 @@ const GoalsPage = () => {
   const loadGoals = async () => {
     try {
       setLoading(true);
+      setError(null);
       const response = await goalService.getAll();
       
       if (response.success) {
@@ -71,8 +72,10 @@ const GoalsPage = () => {
           overallProgress
         });
       }
-    } catch (error: any) {
-      toast.error(error.response?.data?.message || "Failed to load goals");
+    } catch (err: any) {
+      console.error("Failed to load goals:", err);
+      setError(err.response?.data?.message || "Failed to load goals");
+      toast.error(err.response?.data?.message || "Failed to load goals");
     } finally {
       setLoading(false);
     }
@@ -273,6 +276,14 @@ const GoalsPage = () => {
                 <Sparkles className="w-5 h-5 text-emerald-400 animate-pulse" />
               </div>
             </div>
+          </div>
+        ) : error ? (
+          <div className="bg-red-500/20 border border-red-500/30 rounded-xl p-8 text-center">
+            <AlertCircle className="w-12 h-12 text-red-400 mx-auto mb-3" />
+            <p className="text-red-400">{error}</p>
+            <button onClick={loadGoals} className="mt-4 px-4 py-2 bg-red-500/20 rounded-lg text-red-400 hover:bg-red-500/30 transition">
+              Try Again
+            </button>
           </div>
         ) : filteredGoals.length === 0 ? (
           <div className="text-center py-20 bg-white/5 rounded-2xl border border-white/10">
@@ -578,6 +589,4 @@ const GoalsPage = () => {
       </div>
     </div>
   );
-};
-
-export default GoalsPage;
+}
